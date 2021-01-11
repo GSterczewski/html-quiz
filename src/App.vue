@@ -1,12 +1,12 @@
 <template>
   <div>
     <header class="header">
-      <h1>HTML quizz</h1>
+      <h1>HTML quiz</h1>
     </header>
     <main class="main">
-      <section class="intro">
+      <section class="section intro">
         <h2 class="intro__text">
-          👋 Hello, this is a simple quizz to check you knowledge about html
+          👋 Hello, this is a simple quiz to check you knowledge about html
           tags.
         </h2>
         <p class="intro__text">
@@ -16,22 +16,31 @@
           🤞 Good luck!
         </p>
       </section>
-      <secion class="quiz">
+      <section class="section quiz">
         <div class="statistics">
-          <div class="statistic">
-            <p class="statistic__label">Total tags</p>
-            <p class="statistic__value color-dark">{{ elementsCount }}</p>
-          </div>
-          <div class="statistic">
-            <p class="statistic__label">Tags left</p>
-            <p class="statistic__value color-danger">{{ elementsLeft }}</p>
-          </div>
+          <QuizStatistic
+            label="Total HTML5 tags: "
+            :value="elementsCount"
+            valueStyling="color-dark"
+          />
+          <QuizStatistic
+            label="Tags left: "
+            :value="elementsLeft"
+            valueStyling="color-danger"
+          />
+          <QuizStatistic
+            label="Tags found: "
+            :value="elementsFound"
+            valueStyling="color-success"
+          />
         </div>
         <div class="progress-wrapper">
           <ProgressRing :strokeWidth="10" :progress="progress" />
         </div>
         <form class="quiz__form">
           <input
+            name="tag name"
+            aria-label="tag name"
             class="quiz__input"
             :class="invalid ? 'invalid' : ''"
             v-model="currentElement"
@@ -40,8 +49,8 @@
             placeholder="enter html tag name"
           />
           <button
-            role="button"
-            class="quiz__button"
+            type="submit"
+            class="button quiz__button"
             :disabled="invalid || success"
             :class="
               invalid
@@ -55,8 +64,14 @@
             {{ invalid ? "nope" : success ? "great" : "check" }}
           </button>
         </form>
-      </secion>
-      <section class="tags-section">
+        <button
+          class="button button--danger reset-button"
+          @click.prevent="resetProgress"
+        >
+          Reset progress
+        </button>
+      </section>
+      <section class="section tags-section">
         <h3 class="tags-section__heading">Your tags</h3>
         <ul class="tags-section__list">
           <li v-for="element in foundElements" :key="element.id">
@@ -67,112 +82,68 @@
         </ul>
       </section>
     </main>
+    <footer class="footer">
+      <p class="attribution">
+        Designed and coded by
+        <a
+          class="attribution__link"
+          href="https://github.com/GSterczewski"
+          rel="noreferrer"
+          target="_blank"
+          >g.sterczewski</a
+        >
+      </p>
+    </footer>
   </div>
 </template>
 
 <script>
-import { ref, reactive, computed } from "vue";
 import htmlElements from "./elements";
+import useElementSelector from "@/composables/useElementSelector.js";
 import ProgressRing from "@/components/ProgressRing.vue";
 import VueChip from "@/components/VueChip.vue";
+import QuizStatistic from "@/components/QuizStatistic.vue";
 export default {
   name: "App",
-  components: { ProgressRing, VueChip },
+  components: { ProgressRing, VueChip, QuizStatistic },
   setup() {
-    const currentElement = ref(null);
-    const foundElements = reactive([]);
-    const foundElementsMap = {};
-    const elementsCount = htmlElements.length;
-    const elementsLeft = ref(elementsCount);
-    const foundCount = computed(() => 5 - elementsLeft.value);
-    const calculatePercent = (value, max) => Math.round((value / max) * 100);
-    const progress = ref(
-      computed(() => calculatePercent(foundCount.value, elementsCount))
-    );
-    const errorMessage = ref("");
-    const invalid = ref(false);
-    const success = ref(false);
-
-    const clearErrorMessage = () => {
-      errorMessage.value = "";
-    };
-    const setStatus = (status, duration = 1000) => {
-      status.value = true;
-      setTimeout(() => {
-        status.value = false;
-      }, duration);
-    };
-    const checkElement = () => {
-      const element = htmlElements.find(
-        ({ name }) => name === currentElement.value
-      );
-
-      if (element) {
-        if (foundElementsMap[element.id]) {
-          errorMessage.value = `You have already submitted ${element.name}`;
-        } else {
-          setStatus(success);
-          foundElements.push(element);
-          foundElementsMap[element.id] = true;
-          elementsLeft.value--;
-        }
-      } else {
-        errorMessage.value = `${currentElement.value} - no such element`;
-        setStatus(invalid);
-      }
-    };
-    return {
-      currentElement,
-      foundElements,
-      checkElement,
-      errorMessage,
-      clearErrorMessage,
+    const {
       elementsCount,
+      elementsFound,
       elementsLeft,
       progress,
       invalid,
-      success
+      success,
+      currentElement,
+      foundElements,
+      checkElement,
+      resetProgress
+    } = useElementSelector(htmlElements);
+    return {
+      elementsCount,
+      elementsFound,
+      elementsLeft,
+      progress,
+      invalid,
+      success,
+      currentElement,
+      foundElements,
+      checkElement,
+      resetProgress
     };
   }
 };
 </script>
 
 <style lang="scss">
-$color-black: #212f4a;
-$color-gray--blue: #dde5f6;
-$color-gray: #8f9aae;
-$color-gray--light: #f5f8fc;
-$color-red: #fd3689;
-$color-green: #44F6B2;
-$font-family--body: "Yrsa", serif;
-$font-family--headers: "Exo", sans-serif;
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-h1,
-h2,
-h3,
-h4 {
-  font-family: $font-family--headers;
-}
-ul {
-  list-style: none;
-}
-body {
-  background-color: $color-gray--light;
-  width: 100vw;
-  display: flex;
-  justify-content: center;
-  font-family: $font-family--body;
-}
-
 .color-danger {
   color: $color-red;
 }
 .color-dark {
   color: $color-black;
+}
+.color-success {
+  color: $color-green;
 }
 .header {
   padding: 1.4rem;
@@ -183,6 +154,12 @@ body {
   padding: 2rem 5rem;
 }
 
+.section{
+  @media screen and(min-height:1000px){
+    margin-bottom: 10rem;
+
+  }
+}
 .intro {
   &__text {
     font-size: 1.4rem;
@@ -195,6 +172,24 @@ body {
   }
 }
 
+.button {
+  padding: 0.5rem 2rem;
+  border: none;
+  color: #fff;
+  text-transform: uppercase;
+  background-color: $color-black;
+  display: block;
+  &:hover:not(:disabled) {
+    cursor: pointer;
+  }
+  &--danger {
+    background-color: $color-red;
+  }
+}
+.reset-button {
+  margin: 0 auto;
+  margin-top: 3rem;
+}
 .quiz {
   display: block;
   margin-top: 5rem;
@@ -210,17 +205,11 @@ body {
     padding: 0;
   }
   &__button {
-    padding: 0.5rem 2rem;
-    border: none;
-    color: #fff;
-    text-transform: uppercase;
-    background-color: $color-black;
     transition: background-color 0.2s ease-in-out;
     &:hover:not(:disabled),
     &:focus:not(:disabled) {
-      cursor: pointer;
-      background-color: #3E5163;
-    } 
+      background-color: #3e5163;
+    }
     &--invalid {
       background-color: $color-red;
     }
@@ -235,20 +224,6 @@ body {
   justify-content: center;
   margin-bottom: 2rem;
 }
-.statistic {
-  &:not(:last-of-type) {
-    margin-right: 1rem;
-  }
-  display: flex;
-  align-items: center;
-  font-size: 1.5rem;
-  &__label {
-    color: $color-gray;
-    margin-right: 0.5rem;
-    text-transform: uppercase;
-  }
-}
-
 .progress-wrapper {
   width: 100%;
   margin-bottom: 2rem;
@@ -283,6 +258,26 @@ body {
   animation: shake 0.5s 3;
 }
 
+.footer {
+  padding: 1rem 0;
+}
+.attribution {
+  margin: 0 auto;
+  text-align: center;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  &__link {
+    text-decoration: none;
+    color: $color-green;
+    font-weight: bold;
+
+    &:hover,
+    &:focus {
+      text-decoration: underline;
+    }
+  }
+}
+
 @keyframes fly {
   0% {
     transform: translateY(-250px);
@@ -291,7 +286,6 @@ body {
     transform: translate(0);
   }
 }
-
 
 @keyframes shake {
   0% {
