@@ -84,8 +84,8 @@ export default {
     const foundElementsMap = {};
     const elementsCount = htmlElements.length;
     const elementsLeft = ref(elementsCount);
-    const foundCount = computed(() => 5 - elementsLeft.value);
-    const calculatePercent = (value, max) => Math.round((value / max) * 100);
+    const foundCount = computed(() => elementsCount - elementsLeft.value);
+    const calculatePercent = (value, max) => Math.floor((value / max) * 100);
     const progress = ref(
       computed(() => calculatePercent(foundCount.value, elementsCount))
     );
