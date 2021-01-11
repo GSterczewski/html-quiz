@@ -154,10 +154,9 @@ export default {
   padding: 2rem 5rem;
 }
 
-.section{
-  @media screen and(min-height:1000px){
+.section {
+  @media screen and(min-height:1000px) {
     margin-bottom: 10rem;
-
   }
 }
 .intro {
@@ -199,10 +198,12 @@ export default {
     justify-content: center;
   }
   &__input {
-    width: 20rem;
     height: 2rem;
     font-size: 1.2rem;
     padding: 0;
+    @media screen and(min-width:900px) {
+      width: 20rem;
+    }
   }
   &__button {
     transition: background-color 0.2s ease-in-out;
@@ -222,7 +223,12 @@ export default {
   width: 100%;
   display: flex;
   justify-content: center;
+  flex-direction: column;
+  align-items: center;
   margin-bottom: 2rem;
+  @media screen and(min-width:900px) {
+    flex-direction: row;
+  }
 }
 .progress-wrapper {
   width: 100%;
@@ -231,8 +237,11 @@ export default {
   justify-content: center;
 }
 .tags-section {
-  margin-top: 5rem;
+  width: 100vw;
+  max-width: 1000px;
+  //margin-top: 5rem;
   padding-bottom: 5rem;
+  margin: 5rem auto 0 auto;
   background-color: #fff;
   padding: 2rem;
   padding-bottom: 4rem;
@@ -243,7 +252,7 @@ export default {
     text-align: center;
   }
   &__list {
-    width: 100%;
+    //width: 100%;
     display: flex;
     flex-wrap: wrap;
   }
@@ -251,7 +260,8 @@ export default {
 
 .tag {
   display: block;
-  margin-right: 10px;
+  margin-right: 0.75rem;
+  margin-bottom: 1rem;
   animation: fly 0.9s;
 }
 .invalid {
