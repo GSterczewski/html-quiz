@@ -4,7 +4,7 @@
       <h1>HTML quiz</h1>
     </header>
     <main class="main">
-      <section class="intro">
+      <section class="section intro">
         <h2 class="intro__text">
           👋 Hello, this is a simple quiz to check you knowledge about html
           tags.
@@ -16,7 +16,7 @@
           🤞 Good luck!
         </p>
       </section>
-      <section class="quiz">
+      <section class="section quiz">
         <div class="statistics">
           <QuizStatistic
             label="Total HTML5 tags: "
@@ -71,7 +71,7 @@
           Reset progress
         </button>
       </section>
-      <section class="tags-section">
+      <section class="section tags-section">
         <h3 class="tags-section__heading">Your tags</h3>
         <ul class="tags-section__list">
           <li v-for="element in foundElements" :key="element.id">
@@ -154,6 +154,12 @@ export default {
   padding: 2rem 5rem;
 }
 
+.section{
+  @media screen and(min-height:1000px){
+    margin-bottom: 10rem;
+
+  }
+}
 .intro {
   &__text {
     font-size: 1.4rem;
