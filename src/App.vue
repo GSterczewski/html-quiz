@@ -1,12 +1,12 @@
 <template>
   <div>
     <header class="header">
-      <h1>HTML quizz</h1>
+      <h1>HTML quiz</h1>
     </header>
     <main class="main">
       <section class="intro">
         <h2 class="intro__text">
-          👋 Hello, this is a simple quizz to check you knowledge about html
+          👋 Hello, this is a simple quiz to check you knowledge about html
           tags.
         </h2>
         <p class="intro__text">
@@ -18,14 +18,22 @@
       </section>
       <secion class="quiz">
         <div class="statistics">
-          <div class="statistic">
-            <p class="statistic__label">Total tags</p>
-            <p class="statistic__value color-dark">{{ elementsCount }}</p>
-          </div>
-          <div class="statistic">
-            <p class="statistic__label">Tags left</p>
-            <p class="statistic__value color-danger">{{ elementsLeft }}</p>
-          </div>
+          <QuizStatistic
+            label="Total HTML5 tags: "
+            :value="elementsCount"
+            valueStyling="color-dark"
+          />
+          <QuizStatistic
+            label="Tags left: "
+            :value="elementsLeft"
+            valueStyling="color-danger"
+          />
+          <QuizStatistic
+            label="Tags found: "
+            :value="elementsFound"
+            valueStyling="color-success"
+          />
+          
         </div>
         <div class="progress-wrapper">
           <ProgressRing :strokeWidth="10" :progress="progress" />
@@ -75,19 +83,20 @@ import { ref, reactive, computed } from "vue";
 import htmlElements from "./elements";
 import ProgressRing from "@/components/ProgressRing.vue";
 import VueChip from "@/components/VueChip.vue";
+import QuizStatistic from "@/components/QuizStatistic.vue";
 export default {
   name: "App",
-  components: { ProgressRing, VueChip },
+  components: { ProgressRing, VueChip, QuizStatistic },
   setup() {
     const currentElement = ref(null);
     const foundElements = reactive([]);
     const foundElementsMap = {};
     const elementsCount = htmlElements.length;
     const elementsLeft = ref(elementsCount);
-    const foundCount = computed(() => elementsCount - elementsLeft.value);
+    const elementsFound = computed(() => elementsCount - elementsLeft.value);
     const calculatePercent = (value, max) => Math.floor((value / max) * 100);
     const progress = ref(
-      computed(() => calculatePercent(foundCount.value, elementsCount))
+      computed(() => calculatePercent(elementsFound.value, elementsCount))
     );
     const errorMessage = ref("");
     const invalid = ref(false);
@@ -129,6 +138,7 @@ export default {
       clearErrorMessage,
       elementsCount,
       elementsLeft,
+      elementsFound,
       progress,
       invalid,
       success
@@ -138,41 +148,14 @@ export default {
 </script>
 
 <style lang="scss">
-$color-black: #212f4a;
-$color-gray--blue: #dde5f6;
-$color-gray: #8f9aae;
-$color-gray--light: #f5f8fc;
-$color-red: #fd3689;
-$color-green: #44F6B2;
-$font-family--body: "Yrsa", serif;
-$font-family--headers: "Exo", sans-serif;
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-h1,
-h2,
-h3,
-h4 {
-  font-family: $font-family--headers;
-}
-ul {
-  list-style: none;
-}
-body {
-  background-color: $color-gray--light;
-  width: 100vw;
-  display: flex;
-  justify-content: center;
-  font-family: $font-family--body;
-}
-
 .color-danger {
   color: $color-red;
 }
 .color-dark {
   color: $color-black;
+}
+.color-success {
+  color: $color-green;
 }
 .header {
   padding: 1.4rem;
@@ -219,8 +202,8 @@ body {
     &:hover:not(:disabled),
     &:focus:not(:disabled) {
       cursor: pointer;
-      background-color: #3E5163;
-    } 
+      background-color: #3e5163;
+    }
     &--invalid {
       background-color: $color-red;
     }
@@ -235,20 +218,6 @@ body {
   justify-content: center;
   margin-bottom: 2rem;
 }
-.statistic {
-  &:not(:last-of-type) {
-    margin-right: 1rem;
-  }
-  display: flex;
-  align-items: center;
-  font-size: 1.5rem;
-  &__label {
-    color: $color-gray;
-    margin-right: 0.5rem;
-    text-transform: uppercase;
-  }
-}
-
 .progress-wrapper {
   width: 100%;
   margin-bottom: 2rem;
@@ -291,7 +260,6 @@ body {
     transform: translate(0);
   }
 }
-
 
 @keyframes shake {
   0% {
