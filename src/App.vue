@@ -16,7 +16,7 @@
           🤞 Good luck!
         </p>
       </section>
-      <secion class="quiz">
+      <section class="quiz">
         <div class="statistics">
           <QuizStatistic
             label="Total HTML5 tags: "
@@ -33,13 +33,14 @@
             :value="elementsFound"
             valueStyling="color-success"
           />
-          
         </div>
         <div class="progress-wrapper">
           <ProgressRing :strokeWidth="10" :progress="progress" />
         </div>
         <form class="quiz__form">
           <input
+            name="tag name"
+            aria-label="tag name"
             class="quiz__input"
             :class="invalid ? 'invalid' : ''"
             v-model="currentElement"
@@ -48,8 +49,8 @@
             placeholder="enter html tag name"
           />
           <button
-            role="button"
-            class="quiz__button"
+            type="submit"
+            class="button quiz__button"
             :disabled="invalid || success"
             :class="
               invalid
@@ -63,7 +64,13 @@
             {{ invalid ? "nope" : success ? "great" : "check" }}
           </button>
         </form>
-      </secion>
+        <button
+          class="button button--danger reset-button"
+          @click.prevent="resetProgress"
+        >
+          Reset progress
+        </button>
+      </section>
       <section class="tags-section">
         <h3 class="tags-section__heading">Your tags</h3>
         <ul class="tags-section__list">
@@ -75,12 +82,24 @@
         </ul>
       </section>
     </main>
+    <footer class="footer">
+      <p class="attribution">
+        Designed and coded by
+        <a
+          class="attribution__link"
+          href="https://github.com/GSterczewski"
+          rel="noreferrer"
+          target="_blank"
+          >g.sterczewski</a
+        >
+      </p>
+    </footer>
   </div>
 </template>
 
 <script>
-import { ref, reactive, computed } from "vue";
 import htmlElements from "./elements";
+import useElementSelector from "@/composables/useElementSelector.js";
 import ProgressRing from "@/components/ProgressRing.vue";
 import VueChip from "@/components/VueChip.vue";
 import QuizStatistic from "@/components/QuizStatistic.vue";
@@ -88,60 +107,29 @@ export default {
   name: "App",
   components: { ProgressRing, VueChip, QuizStatistic },
   setup() {
-    const currentElement = ref(null);
-    const foundElements = reactive([]);
-    const foundElementsMap = {};
-    const elementsCount = htmlElements.length;
-    const elementsLeft = ref(elementsCount);
-    const elementsFound = computed(() => elementsCount - elementsLeft.value);
-    const calculatePercent = (value, max) => Math.floor((value / max) * 100);
-    const progress = ref(
-      computed(() => calculatePercent(elementsFound.value, elementsCount))
-    );
-    const errorMessage = ref("");
-    const invalid = ref(false);
-    const success = ref(false);
-
-    const clearErrorMessage = () => {
-      errorMessage.value = "";
-    };
-    const setStatus = (status, duration = 1000) => {
-      status.value = true;
-      setTimeout(() => {
-        status.value = false;
-      }, duration);
-    };
-    const checkElement = () => {
-      const element = htmlElements.find(
-        ({ name }) => name === currentElement.value
-      );
-
-      if (element) {
-        if (foundElementsMap[element.id]) {
-          errorMessage.value = `You have already submitted ${element.name}`;
-        } else {
-          setStatus(success);
-          foundElements.push(element);
-          foundElementsMap[element.id] = true;
-          elementsLeft.value--;
-        }
-      } else {
-        errorMessage.value = `${currentElement.value} - no such element`;
-        setStatus(invalid);
-      }
-    };
-    return {
+    const {
+      elementsCount,
+      elementsFound,
+      elementsLeft,
+      progress,
+      invalid,
+      success,
       currentElement,
       foundElements,
       checkElement,
-      errorMessage,
-      clearErrorMessage,
+      resetProgress
+    } = useElementSelector(htmlElements);
+    return {
       elementsCount,
-      elementsLeft,
       elementsFound,
+      elementsLeft,
       progress,
       invalid,
-      success
+      success,
+      currentElement,
+      foundElements,
+      checkElement,
+      resetProgress
     };
   }
 };
@@ -178,6 +166,24 @@ export default {
   }
 }
 
+.button {
+  padding: 0.5rem 2rem;
+  border: none;
+  color: #fff;
+  text-transform: uppercase;
+  background-color: $color-black;
+  display: block;
+  &:hover:not(:disabled) {
+    cursor: pointer;
+  }
+  &--danger {
+    background-color: $color-red;
+  }
+}
+.reset-button {
+  margin: 0 auto;
+  margin-top: 3rem;
+}
 .quiz {
   display: block;
   margin-top: 5rem;
@@ -193,15 +199,9 @@ export default {
     padding: 0;
   }
   &__button {
-    padding: 0.5rem 2rem;
-    border: none;
-    color: #fff;
-    text-transform: uppercase;
-    background-color: $color-black;
     transition: background-color 0.2s ease-in-out;
     &:hover:not(:disabled),
     &:focus:not(:disabled) {
-      cursor: pointer;
       background-color: #3e5163;
     }
     &--invalid {
@@ -250,6 +250,26 @@ export default {
 }
 .invalid {
   animation: shake 0.5s 3;
+}
+
+.footer {
+  padding: 1rem 0;
+}
+.attribution {
+  margin: 0 auto;
+  text-align: center;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  &__link {
+    text-decoration: none;
+    color: $color-green;
+    font-weight: bold;
+
+    &:hover,
+    &:focus {
+      text-decoration: underline;
+    }
+  }
 }
 
 @keyframes fly {
