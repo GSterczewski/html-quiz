@@ -1,6 +1,9 @@
 # HTML Quiz
 
- 👋 Hi, this is a simple quiz to test knowledge about all currently available html tags.
+👋 Hi, this is a simple quiz to test knowledge about all currently available html tags.
  
- It's built with `Vue` `Sass`
- 
+You can test yourself here -> https://html-quiz.vercel.app/
+
+Built with `Vue` `Sass`
+
+Currently there are 108 html tags to find.
