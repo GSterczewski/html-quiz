@@ -1,6 +1,6 @@
 let elementsCount = 0;
 
-const createElement = name =>({
+const createElement = name => ({
   id: `element-${elementsCount++}`,
   name
 });
@@ -30,6 +30,7 @@ const htmlElements = [
   createElement("colgroup"),
   createElement("data"),
   createElement("datalist"),
+  createElement("details"),
   createElement("dd"),
   createElement("del"),
   createElement("dfn"),

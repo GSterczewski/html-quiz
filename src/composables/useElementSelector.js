@@ -55,7 +55,6 @@ const useElementsSelector = htmlElements => {
     if (confirm) {
       store.clear();
       foundElements.splice(0, foundElements.length);
-
     }
   };
   return {
