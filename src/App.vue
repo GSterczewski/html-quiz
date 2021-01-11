@@ -42,9 +42,17 @@
           <button
             role="button"
             class="quiz__button"
+            :disabled="invalid || success"
+            :class="
+              invalid
+                ? 'quiz__button--invalid'
+                : success
+                ? 'quiz__button--success'
+                : ''
+            "
             @click.prevent="checkElement"
           >
-            check
+            {{ invalid ? "nope" : success ? "great" : "check" }}
           </button>
         </form>
       </secion>
@@ -83,8 +91,16 @@ export default {
     );
     const errorMessage = ref("");
     const invalid = ref(false);
+    const success = ref(false);
+
     const clearErrorMessage = () => {
       errorMessage.value = "";
+    };
+    const setStatus = (status, duration = 1000) => {
+      status.value = true;
+      setTimeout(() => {
+        status.value = false;
+      }, duration);
     };
     const checkElement = () => {
       const element = htmlElements.find(
@@ -95,16 +111,14 @@ export default {
         if (foundElementsMap[element.id]) {
           errorMessage.value = `You have already submitted ${element.name}`;
         } else {
+          setStatus(success);
           foundElements.push(element);
           foundElementsMap[element.id] = true;
           elementsLeft.value--;
         }
       } else {
-        invalid.value = true;
         errorMessage.value = `${currentElement.value} - no such element`;
-        setTimeout(() => {
-          invalid.value = false;
-        }, 1000);
+        setStatus(invalid);
       }
     };
     return {
@@ -116,7 +130,8 @@ export default {
       elementsCount,
       elementsLeft,
       progress,
-      invalid
+      invalid,
+      success
     };
   }
 };
@@ -128,6 +143,7 @@ $color-gray--blue: #dde5f6;
 $color-gray: #8f9aae;
 $color-gray--light: #f5f8fc;
 $color-red: #fd3689;
+$color-green: #44F6B2;
 $font-family--body: "Yrsa", serif;
 $font-family--headers: "Exo", sans-serif;
 * {
@@ -194,7 +210,23 @@ body {
     padding: 0;
   }
   &__button {
-    padding: 0.37rem 2rem;
+    padding: 0.5rem 2rem;
+    border: none;
+    color: #fff;
+    text-transform: uppercase;
+    background-color: $color-black;
+    transition: background-color 0.2s ease-in-out;
+    &:hover:not(:disabled),
+    &:focus:not(:disabled) {
+      cursor: pointer;
+      background-color: #3E5163;
+    } 
+    &--invalid {
+      background-color: $color-red;
+    }
+    &--success {
+      background-color: $color-green;
+    }
   }
 }
 .statistics {
@@ -241,12 +273,26 @@ body {
     flex-wrap: wrap;
   }
 }
+
 .tag {
+  display: block;
   margin-right: 10px;
+  animation: fly 0.9s;
 }
 .invalid {
   animation: shake 0.5s 3;
 }
+
+@keyframes fly {
+  0% {
+    transform: translateY(-250px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+
+
 @keyframes shake {
   0% {
     transform: translate(1px, 1px) rotate(0deg);
