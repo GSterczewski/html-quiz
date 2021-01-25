@@ -7,3 +7,5 @@ You can test yourself here -> https://html-quiz.vercel.app/
 Built with `Vue` `Sass`
 
 Currently there are 109 html tags to find.
+
+It's still under development. 
